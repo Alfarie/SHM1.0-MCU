@@ -3,12 +3,12 @@
 #include <LiquidCrystal_I2C.h>
 #include <EEPROM.h>
 #include <SPI.h>
-#include <MCP320X.h>
+// #include <MCP320X.h>
 #include <LibHumidity.h>
 
 LibHumidity humidity = LibHumidity(0);
 
-MCP320X adc(53);
+// MCP320X adc(53);
 
 LiquidCrystal_I2C lcd(0x3E, 16, 2);
 
@@ -67,7 +67,7 @@ DebugCheck debug;
 void setup()
 {
     SPI.begin();
-    adc.begin();
+    // adc.begin();
     Wire.begin();
     
     lcd.begin();

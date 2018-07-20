@@ -11,17 +11,17 @@ class Gpio
     static const uint16_t SAFETY_FLOATING_SENSOR = A10;
 
     //AC
-    static const uint16_t PH_SENSOR = A2;
-    static const uint16_t EC_SENSOR = A3;
+    static const uint16_t PH_SENSOR = A1;
+    static const uint16_t EC_SENSOR = A0;
+    static const uint16_t WATER_SENSOR = A2;
 
     // actuator
     static const uint16_t FEED_WATER_MOTOR = 6;
     static const uint16_t FRESH_WATER_VALVE = 9;
 
-    static const uint16_t EC_A_PUMP = 6;
-    static const uint16_t EC_B_PUMP = 6;
-
-    static const uint16_t PH_PUMP = 5;
+    static const uint16_t EC_A_PUMP = 8;
+    static const uint16_t EC_B_PUMP = 8;
+    static const uint16_t PH_PUMP = 9;
 
     static const uint16_t CO2_VALVE = 7;
 
@@ -31,7 +31,7 @@ class Gpio
 
     static const uint16_t DOOR_BUTTON = 23;
 
-    static const uint16_t WATER_SENSOR = A2;
+   
 
     static void InitPin()
     {

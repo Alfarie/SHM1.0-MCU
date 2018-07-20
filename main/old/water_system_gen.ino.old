@@ -1,0 +1,233 @@
+/*
+ *  //Serial command:
+ *  -  WATER{0,10,15} 
+ *  -  DATETIME{11,9,17,3,30}
+ * 
+ * 
+ */
+
+
+
+#include <StandardCplusplus.h>
+#include<vector>
+#include<Wire.h>
+
+#define UFW_FLOAT 5
+#define LFW_FLOAT 6
+#define LT_FLOAT 7
+
+#define MOTOR 8
+#define FW_VALVE 9
+#define WT_VALVE 10
+
+#define DS1307_I2C_ADDRESS 0x68
+
+struct WaterParam {
+  uint32_t start_time;
+  uint32_t working_time;
+  uint32_t waiting_time;
+};
+
+struct Timer {
+  uint32_t start_time;
+  uint32_t end_time;
+};
+
+struct DateTime {
+  uint8_t second;
+  uint8_t minute;
+  uint8_t hour;
+  uint8_t dow;
+  uint8_t day;
+  uint8_t month;
+  uint8_t year;
+};
+
+struct 
+
+DateTime date_time;
+WaterParam wt_param;
+std::vector<Timer> timer_list;
+
+
+
+
+String cmd;
+
+void TestPassByRef(std::vector<Timer> &tl) {
+  uint32_t val1 = tl.at(0).start_time;
+  uint32_t val2 = tl.at(0).end_time;
+  //Serial.println( String(val1) + "," + String(val2) );
+  tl.at(0).end_time = 70;
+}
+
+void GenTimerList(WaterParam wt, std::vector<Timer> &tl) {
+  uint32_t rt = wt.working_time + wt.waiting_time;
+  uint32_t trt = floor(1440 / rt);
+
+  for (int i = 0 ; i <= trt ; i++) {
+    uint32_t Start = (wt.start_time + (rt * i) ) % 1440;
+    uint32_t End = Start + wt.working_time;
+
+    Timer nt = {Start, End};
+    tl.push_back(nt);
+  }
+}
+
+
+void setDateDs1307(byte s , byte m , byte h , byte dow , byte dom , byte mo , byte y)
+{
+  Wire.beginTransmission(DS1307_I2C_ADDRESS);
+  Wire.write(decToBcd(0));
+  Wire.write(decToBcd(s)); // 0 to bit 7 starts the clock
+  Wire.write(decToBcd(m));
+  Wire.write(decToBcd(h)); // If you want 12 hour am/pm you need to set
+  // bit 6 (also need to change readDateDs1307)
+  Wire.write(decToBcd(dow));
+  Wire.write(decToBcd(dom));
+  Wire.write(decToBcd(mo));
+  Wire.write(decToBcd(y));
+  Wire.endTransmission();
+}
+
+void getDateDs1307(DateTime &dt)
+{
+
+  Wire.beginTransmission(DS1307_I2C_ADDRESS);
+  Wire.write(decToBcd(0));
+  Wire.endTransmission();
+  Wire.requestFrom(DS1307_I2C_ADDRESS, 7);
+  dt.second = bcdToDec(Wire.read() & 0x7f);
+  dt.minute = bcdToDec(Wire.read());
+  dt.hour = bcdToDec(Wire.read() & 0x3f); // Need to change this if 12 hour am/pm
+  dt.dow = bcdToDec(Wire.read());
+  dt.day = bcdToDec(Wire.read());
+  dt.month = bcdToDec(Wire.read());
+  dt.year = bcdToDec(Wire.read());
+}
+
+void checkValve(){
+  if(timer_list.size() != 0 ){
+    uint32_t nt = getTimeMinute();
+//    //Serial.println("now: " + String(nt));
+    for(int i = 0; i < timer_list.size(); i++){
+      if( nt >= timer_list.at(i).start_time && nt <= timer_list.at(i).end_time){
+        //Serial.println("valve ON");
+        return;
+      }
+    }
+  }
+  else{
+//    //Serial.println("No timer list");
+  }
+}
+
+uint32_t getTimeMinute() {
+  getDateDs1307(date_time);
+  return date_time.hour * 60 + date_time.minute;
+}
+
+byte decToBcd(byte val) {
+  return ( (val / 10 * 16) + (val % 10) );
+}
+byte bcdToDec(byte val) {
+  return ( (val / 16 * 10) + (val % 16) );
+}
+
+void setup() {
+  //Serial.begin(57600);
+  Wire.begin();
+  wt_param = {0, 5, 15};
+  // setDateDs1307(0, 30, 3, 6, 11, 9, 17);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  // //Serial.println("Test");
+  getDateDs1307(date_time);
+  checkValve();
+  while (//Serial.available()) {
+    char ch = //Serial.read();
+    cmd += ch;
+    if (cmd.endsWith("WATER")) {
+     
+      cmd = "";
+      bool flag = true;
+      while (true) {
+        while (//Serial.available()) {
+          ch = //Serial.read();
+          cmd += ch;
+          if (cmd.endsWith("}")) {
+            String rstr = cmd;
+            rstr.replace("{" , "");
+            rstr.replace("}" , "");
+            rstr.replace("WATER", "");
+            uint32_t data[3] = {0, 0, 0};
+            int i = 0 , si = 0 , ei, j = 0;
+            while (j < 3) {
+              int index = rstr.indexOf(",");
+              String a =  rstr.substring(0 , index);
+              data[j] = a.toInt();
+              si = index;
+              rstr = rstr.substring(index + 1);
+              j++;
+            }
+            wt_param = {data[0], data[1], data[2]};
+
+            GenTimerList(wt_param, timer_list);
+            for (int i = 0 ; i < timer_list.size() ; i++) {
+              uint32_t Start = timer_list.at(i).start_time;
+              uint32_t End = timer_list.at(i).end_time;
+              //Serial.println( String(Start) + "-" + String(End));
+            }
+            flag = false;
+          }
+        }
+        if (!flag) {
+          //Serial.flush();
+          break;
+        }
+      }
+    }
+
+    if (cmd.endsWith("DATETIME")) {
+      ////Serial.println("[DATETIME] fomr node");
+      cmd = "";
+      bool flag = true;
+
+      while (true) {
+        while (//Serial.available()) {
+          ch = //Serial.read();
+          cmd += ch;
+          if (cmd.endsWith("}")) {
+            String rstr = cmd;
+            rstr.replace("{" , "");
+            rstr.replace("}" , "");
+            rstr.replace("DATETIME", "");
+            int data[5] = {0, 0, 0, 0, 0};
+            int i = 0 , si = 0 , ei, j = 0;
+            while (j < 5) {
+              int index = rstr.indexOf(",");
+              String a =  rstr.substring(0 , index);
+              data[j] = a.toInt();
+
+              si = index;
+              rstr = rstr.substring(index + 1);
+              j++;
+
+            }
+            //second, min,hour, dow,dom, month,year
+            //DATETIME{11,9,17,3,30}
+            setDateDs1307(0, data[4], data[3], 6, data[0], data[1], data[2]);
+            flag = false;
+          }
+        }
+        if (!flag) {
+          //Serial.flush();
+          break;
+        }
+      }
+
+    }
+  }
+}

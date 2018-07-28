@@ -15,7 +15,7 @@ class ECControl : public Task
     void SetEC(float ec)
     {
         _setpoint = ec;
-        // //Serial.println("EC: " + String(_upper) + "," + String(_lower));
+        // //mpuCom.println("EC: " + String(_upper) + "," + String(_lower));
     }
 
     void SetTiming(int working, int detecting)
@@ -39,7 +39,7 @@ class ECControl : public Task
         _setpoint = GlobalControl::EC_SETPOINT;
         _working = GlobalControl::EC_WORKING * 1000;
         _detecting = GlobalControl::EC_DETECTING * 1000;
-        Serial.println("[Info] EC Control initialize...");
+        mpuCom.println("[Info] EC Control initialize...");
     }
     virtual void OnUpdate(uint32_t delta_time)
     {
@@ -48,12 +48,12 @@ class ECControl : public Task
         // detecting mode
         if (working_state && (sensor < _setpoint))
         {
-            // Serial.println("working state");'
+            // mpuCom.println("working state");'
             _timer += (float)delta_time/1000;
-            // Serial.println("EC working " + String(_timer) + "/" + String(_working));
+            // mpuCom.println("EC working " + String(_timer) + "/" + String(_working));
             analogWrite(Gpio::EC_A_PUMP, 255);
             String jsonStr = "{\"type\": \"ec-control\",\"data\": { \"time\":" + String(_timer*1000) + ", \"endtime\": " + String(_working) + ", \"process\": \"Working\"} }";
-            Serial.println(jsonStr);
+            mpuCom.println(jsonStr);
             if (_timer >= GlobalControl::EC_WORKING)
             {
                 digitalWrite(Gpio::EC_A_PUMP, LOW);
@@ -71,10 +71,10 @@ class ECControl : public Task
         if (detecting_state)
         {
             _timer += (float)delta_time/1000;
-            // Serial.println("detecting state");
-            // Serial.println("EC detecting " + String(_timer) + "/" + String(_detecting));
+            // mpuCom.println("detecting state");
+            // mpuCom.println("EC detecting " + String(_timer) + "/" + String(_detecting));
             String jsonStr = "{\"type\": \"ec-control\",\"data\": { \"time\":" + String(_timer*1000) + ", \"endtime\": " + String(_detecting) + ", \"process\": \"Waiting\"} }";
-            Serial.println(jsonStr);
+            mpuCom.println(jsonStr);
             if (_timer >= GlobalControl::EC_DETECTING)
             {
                 _timer = 0;
@@ -88,7 +88,7 @@ class ECControl : public Task
 // detecting mode
 //   if (working_state && (sensor < _setpoint))
 //         {
-//             // Serial.println("working state");
+//             // mpuCom.println("working state");
 //             analogWrite(Gpio::EC_A_PUMP, 255);
 //             if (_timer >= _working)
 //             {
@@ -106,7 +106,7 @@ class ECControl : public Task
 
 //         if (detecting_state)
 //         {
-//             // Serial.println("detecting state");
+//             // mpuCom.println("detecting state");
 //             if (_timer >= _detecting)
 //             {
 //                 _timer = 0;

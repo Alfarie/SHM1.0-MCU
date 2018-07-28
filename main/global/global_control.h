@@ -49,7 +49,7 @@ class GlobalControl
             GlobalControl::GetECTimer();
             isInit = 2;
             EEPROM.put(EEPROM_ADDR::ISINIT_EEPROM, isInit);
-            Serial.println("Init all setting...");
+            mpuCom.println("Init all setting...");
         }
         else if (isInit == 2)
         {
@@ -72,28 +72,28 @@ class GlobalControl
     }
     static void ShowSetting()
     {
-        Serial.println("[Info] EC Setpoint: " + String(GlobalControl::EC_SETPOINT));
-        Serial.println("[Info] EC Detecting: " + String(GlobalControl::EC_DETECTING));
-        Serial.println("[Info] EC Working: " + String(GlobalControl::EC_WORKING));
-        Serial.println("[Info] EC Calibration: " + String(GlobalControl::EC_CAL));
+        mpuCom.println("[Info] EC Setpoint: " + String(GlobalControl::EC_SETPOINT));
+        mpuCom.println("[Info] EC Detecting: " + String(GlobalControl::EC_DETECTING));
+        mpuCom.println("[Info] EC Working: " + String(GlobalControl::EC_WORKING));
+        mpuCom.println("[Info] EC Calibration: " + String(GlobalControl::EC_CAL));
 
-        Serial.println("[Info] pH Setpoint: " + String(GlobalControl::PH_SETPOINT));
-        Serial.println("[Info] pH Detecting: " + String(GlobalControl::PH_DETECTING));
-        Serial.println("[Info] pH Working: " + String(GlobalControl::PH_WORKING));
-        Serial.println("[Info] pH Calibration: " + String(GlobalControl::PH_CAL));
+        mpuCom.println("[Info] pH Setpoint: " + String(GlobalControl::PH_SETPOINT));
+        mpuCom.println("[Info] pH Detecting: " + String(GlobalControl::PH_DETECTING));
+        mpuCom.println("[Info] pH Working: " + String(GlobalControl::PH_WORKING));
+        mpuCom.println("[Info] pH Calibration: " + String(GlobalControl::PH_CAL));
 
-        Serial.println("[Info] CO2 Setpoint: " + String(GlobalControl::CO2_SETPOINT));
+        mpuCom.println("[Info] CO2 Setpoint: " + String(GlobalControl::CO2_SETPOINT));
 
-        Serial.println("[Info] EC working: " + String(GlobalControl::EC_TIMER_WORKING));
-        Serial.print("[Info] EC Timer: ");
+        mpuCom.println("[Info] EC working: " + String(GlobalControl::EC_TIMER_WORKING));
+        mpuCom.print("[Info] EC Timer: ");
         for (int i = 0; i < GlobalControl::EC_TIMER_SIZE; i++)
         {
-            Serial.print(GlobalControl::EC_TIMER_LIST.at(i));
-            Serial.print(" ");
+            mpuCom.print(GlobalControl::EC_TIMER_LIST.at(i));
+            mpuCom.print(" ");
         }
-        Serial.println();
-        Serial.println("[Info] EC Timer Size: " + String(GlobalControl::EC_TIMER_SIZE));
-        Serial.println("[Info] EC Timer Mode: " + String(GlobalControl::EC_MODE));
+        mpuCom.println();
+        mpuCom.println("[Info] EC Timer Size: " + String(GlobalControl::EC_TIMER_SIZE));
+        mpuCom.println("[Info] EC Timer Mode: " + String(GlobalControl::EC_MODE));
     }
     static void UpdateSolEEPROM()
     {
@@ -198,7 +198,7 @@ class GlobalControl
     {
         EEPROM.get(EEPROM_ADDR::TIMER_SIZE, GlobalControl::TIMER_SIZE);
         int size = GlobalControl::TIMER_SIZE;
-        Serial.println("size: " + String(size));
+        mpuCom.println("size: " + String(size));
         std::vector<Timer> timer_list;
         for (int i = 0; i < size; i++)
         {

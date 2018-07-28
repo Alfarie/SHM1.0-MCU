@@ -21,13 +21,13 @@ class CirculateWater : public Task
     }
     virtual void OnUpdate(uint32_t delta_time)
     {
-        //Serial.println("Circulate Water");
+        //mpuCom.println("Circulate Water");
         _timer += delta_time;
         lcd.setCursor(0,1);
         String str = "Timer: " + String(_timer/1000) +"/" + String(rtime/1000);
 
         String jsonStr = "{\"type\": \"water\",\"data\": { \"time\":" + String(_timer) + ", \"total_time\": "+ String(rtime) + ", \"process\": \"Circulating\"} }";
-        Serial.println(jsonStr);
+        mpuCom.println(jsonStr);
 
         lcd.print(str);
         if (_timer >= rtime)

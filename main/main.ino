@@ -6,6 +6,8 @@
 // #include <MCP320X.h>
 #include <LibHumidity.h>
 
+HardwareSerial &mpuCom = Serial3;
+
 LibHumidity humidity = LibHumidity(0);
 
 // MCP320X adc(53);
@@ -20,8 +22,8 @@ struct Timer
 
 TaskManager taskManager;
 boolean DEBUG = false;
-int ON = HIGH;
-int OFF = LOW;
+int ON_S = HIGH;
+int OFF_S = LOW;
 #include "./global/gpio.h"
 #include "./global/eeprom_addr.h"
 
@@ -30,6 +32,7 @@ int OFF = LOW;
 
 #include "./modules/DateTime.h"
 DateTimeTask dt;
+#include "./modules/RTC.h"
 
 void FreshWaterCallback(uint8_t);
 void CookCallback(uint8_t);
@@ -64,17 +67,15 @@ Communication com(&sensor, &eccontrol,&ectimercontrol, &phcontrol, &co2control, 
 
 DebugCheck debug;
 
+
+
 void setup()
 {
     SPI.begin();
     // adc.begin();
     Wire.begin();
-    
-    lcd.begin();
-    lcd.print("PlantLab");
 
-    Serial.begin(57600);
-    Serial3.begin(57600);
+    mpuCom.begin(57600);
 
     SerialOnStart();
     // Initialize EEPROM
@@ -84,6 +85,7 @@ void setup()
     Gpio::InitPin();
 
     taskManager.StartTask(&dt);
+    taskManager.StartTask(RTC::instance());
     taskManager.StartTask(&com);
     //start Water process
 
@@ -112,7 +114,7 @@ void ProcessStart()
 
 void FreshWaterCallback(uint8_t state)
 {
-    //Serial.println("FreshWater Callback" + String(state));
+    //mpuCom.println("FreshWater Callback" + String(state));
     taskManager.StopTask(&freshWater);
 
     lcd.clear();
@@ -123,7 +125,7 @@ void FreshWaterCallback(uint8_t state)
 
 void CookCallback(uint8_t state)
 {
-    //Serial.println("Cook Callback" + String(state));
+    //mpuCom.println("Cook Callback" + String(state));
     taskManager.StopTask(&cook);
 
     lcd.clear();
@@ -135,7 +137,7 @@ void CookCallback(uint8_t state)
 
 void CirculateCallback(uint8_t state)
 {
-    //Serial.println("FeedWater Callback" + String(state));
+    //mpuCom.println("FeedWater Callback" + String(state));
     taskManager.StopTask(&circulateWater);
 
     lcd.clear();
@@ -148,10 +150,10 @@ void CirculateCallback(uint8_t state)
 void SerialOnStart()
 {
     String debugMode = (DEBUG) ? "true" : "false";
-    Serial.println();
-    Serial.println("[Info] PlantLab Demo Version.");
-    Serial.println("[Info] Initialize...");
-    Serial.println("[Info] Debug Mode: " + debugMode);
-    Serial.println("[Info] successful.");
-    Serial.println();
+    mpuCom.println();
+    mpuCom.println("[Info] PlantLab Demo Version.");
+    mpuCom.println("[Info] Initialize...");
+    mpuCom.println("[Info] Debug Mode: " + debugMode);
+    mpuCom.println("[Info] successful.");
+    mpuCom.println();
 }

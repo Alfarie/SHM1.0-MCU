@@ -30,12 +30,12 @@ class FreshWater : public Task
         _total_time = 0;
         pinMode(_Pin, INPUT);
         int state = digitalRead(_Pin);
-        //Serial.println("Initial state: " + String(state));
+        //mpuCom.println("Initial state: " + String(state));
         if(state == HIGH){
             finish = true;
         }
         else{
-            digitalWrite(Gpio::FRESH_WATER_VALVE, ON);
+            digitalWrite(Gpio::FRESH_WATER_VALVE, ON_S);
         }
         
     }
@@ -43,11 +43,11 @@ class FreshWater : public Task
     virtual void OnUpdate(uint32_t deltaTime)
     {
         _total_time += deltaTime;
-        //Serial.println("Freshwater update");
+        //mpuCom.println("Freshwater update");
         waiting += deltaTime;
-        //Serial.println("Finish: " + String(finish));
+        //mpuCom.println("Finish: " + String(finish));
         String jsonStr = "{\"type\": \"water\",\"data\": { \"time\":" + String(_total_time) + ", \"total_time\":0 , \"process\": \"Fill water\"} }";
-        Serial.println(jsonStr);
+        mpuCom.println(jsonStr);
         if(waiting >= 2000){
              if(finish){
                 _callback(1);
@@ -65,7 +65,7 @@ class FreshWater : public Task
                 _callback(_state);
                 _state = 0;
                 _timer = 0;
-                digitalWrite(Gpio::FRESH_WATER_VALVE, OFF);
+                digitalWrite(Gpio::FRESH_WATER_VALVE, OFF_S);
             }
 
             if (digitalRead(_Pin) == _state)

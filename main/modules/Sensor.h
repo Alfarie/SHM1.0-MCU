@@ -47,7 +47,7 @@ class Sensor : public Task
 
     virtual bool OnStart()
     {
-        Serial.println("[PlantLab] Sensor module initialize..");
+        mpuCom.println("[PlantLab] Sensor module initialize..");
         
         taskManager.StartTask(&co2);
         taskManager.StartTask(&water);
@@ -84,9 +84,9 @@ class Sensor : public Task
     void showAllSensor()
     {
         String sensorDataJsonStr = "{ \"co2\":" + String(_co2)+ ",\"ec\":" + String(_ec)   + ",\"water\":" + String(_water) + "," + " \"ph\":"+String(_ph) + "," + " \"temp\":" + String(_temperature)+ "," +
-            " \"humi\":"+ String(_humidity) +  ", \"date\":" + "\"" +dt.GetDateString() + "\"" +  ", \"time\":"  + "\"" +dt.GetTimeString()  + "\"" +  "}";
+            " \"humi\":"+ String(_humidity) +  ", \"date\":" + "\"" + RTC::instance()->GetDateString() + "\"" +  ", \"time\":"  + "\"" + RTC::instance()->GetTimeString()  + "\"" +  "}";
         String jsonStr = "{\"type\": \"sensor\",\"data\": " + sensorDataJsonStr + "}" ;
-        Serial.println(jsonStr);
+        mpuCom.println(jsonStr);
     }
     
     int freemem()

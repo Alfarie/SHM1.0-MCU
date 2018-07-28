@@ -36,19 +36,19 @@ class Communication : public Task
     {
         String res;
         bool flag = false;
-        while (Serial.available())
+        while (mpuCom.available())
         {
-            if (Serial.read() == '{')
+            if (mpuCom.read() == '{')
             {
                 int r = 0;
                 while (true)
                 {
-                    if (Serial.available())
+                    if (mpuCom.available())
                     {
-                        char ch = Serial.read();
+                        char ch = mpuCom.read();
                         if (ch == '}')
                         {
-                            Serial.println(res);
+                            mpuCom.println(res);
                             flag = true;
                             break;
                         }
@@ -81,7 +81,7 @@ class Communication : public Task
                     _eccontrol->SetEC(GlobalControl::EC_SETPOINT);
                     GlobalControl::UpdateSolEEPROM();
                     String jsonStr = "{\"type\": \"set_setting_success\",\"data\": \"Setting successful.\"}";
-                    Serial.println(jsonStr);
+                    mpuCom.println(jsonStr);
                 }
                 // {cal, 0.81, 1.33}
                 if (res.startsWith("cal"))
@@ -94,8 +94,8 @@ class Communication : public Task
                     GlobalControl::EC_CAL = cal[0];
                     GlobalControl::PH_CAL = cal[1];
 
-                    Serial.println(GlobalControl::EC_CAL);
-                    Serial.println(GlobalControl::PH_CAL);
+                    mpuCom.println(GlobalControl::EC_CAL);
+                    mpuCom.println(GlobalControl::PH_CAL);
 
                     GlobalControl::UpdateCalEEPROM();
                 }
@@ -120,15 +120,15 @@ class Communication : public Task
                     ExtractDataInt(dt, 5, res);
                     for (int i = 0; i < 5; i++)
                     {
-                        Serial.print(String(dt[i]) + " ");
+                        mpuCom.print(String(dt[i]) + " ");
                     }
-                    Serial.println();
+                    mpuCom.println();
                     // (byte s, byte m, byte h, byte dow, byte dom, byte mo, byte y)
-                    _datetime->setDateDs1307(0, dt[4], dt[3], 0, dt[0], dt[1], dt[2]);
-                    Serial.println("[Info] Set date time successfull");
+                    RTC::instance()->setDateDs1307(0, dt[4], dt[3], 0, dt[0], dt[1], dt[2]);
+                    mpuCom.println("[Info] Set date time successfull");
 
                     String jsonStr = "{\"type\": \"set_setting_success\",\"data\": \"Setting successful.\"}";
-                    Serial.println(jsonStr);
+                    mpuCom.println(jsonStr);
                 }
 
                 if (res.startsWith("ectimer"))
@@ -142,16 +142,16 @@ class Communication : public Task
                     std::vector<int> timer_list;
                     for (int i = 1; i < size; i++)
                     {
-                        Serial.print(String(dt[i]) + " ");
+                        mpuCom.print(String(dt[i]) + " ");
                         timer_list.push_back(dt[i]);
                     }
-                    Serial.println();
+                    mpuCom.println();
 
                     GlobalControl::UpdateECTimer(timer_list, dt[0]);
-                    Serial.println("[Info] Set ec timer successfull");
+                    mpuCom.println("[Info] Set ec timer successfull");
 
                     String jsonStr = "{\"type\": \"set_setting_success\",\"data\": \"Setting successful.\"}";
-                    Serial.println(jsonStr);
+                    mpuCom.println(jsonStr);
                 }
                 if (res.startsWith("ecmode"))
                 {
@@ -160,24 +160,24 @@ class Communication : public Task
                     int dt[2];
                     ExtractDataInt(dt, 1, res);
                     GlobalControl::UpdateECMode(dt[0]);
-                    Serial.println("[Info] Set ec mode successfull :" + String(dt[0]));
+                    mpuCom.println("[Info] Set ec mode successfull :" + String(dt[0]));
 
                     if (dt[0] == 0)
                     {
-                        digitalWrite(Gpio::EC_A_PUMP, OFF);
+                        digitalWrite(Gpio::EC_A_PUMP, OFF_S);
                         taskManager.StopTask(_ectimercontrol);
                         taskManager.StartTask(_eccontrol);
                         
                     }
                     else if (dt[0] == 1)
                     {
-                        digitalWrite(Gpio::EC_A_PUMP, OFF);
+                        digitalWrite(Gpio::EC_A_PUMP, OFF_S);
                         taskManager.StopTask(_eccontrol);
                         taskManager.StartTask(_ectimercontrol);
                     }
                     else if (dt[0] == 2)
                     {
-                        digitalWrite(Gpio::EC_A_PUMP, OFF);
+                        digitalWrite(Gpio::EC_A_PUMP, OFF_S);
                         taskManager.StopTask(_ectimercontrol);
                         taskManager.StopTask(_eccontrol);
                     }
@@ -194,7 +194,7 @@ class Communication : public Task
                     std::vector<Timer> timerlist = TimerStringToTimer(timer, size);
                     _timercontrol->SetTimerList(timerlist);
                     GlobalControl::UpdateTimer(timerlist);
-                    Serial.println("[Info] Set timer successfull");
+                    mpuCom.println("[Info] Set timer successfull");
                 }
 
                 if (res.startsWith("cmd"))
@@ -207,12 +207,12 @@ class Communication : public Task
                     if (d[0] == "close-all")
                     {
 
-                        Serial.println("[Done] Close All pin: successful");
+                        mpuCom.println("[Done] Close All pin: successful");
                     }
                     else if (d[0] == "open-all")
                     {
 
-                        Serial.println("[Done] Open All pin: successful");
+                        mpuCom.println("[Done] Open All pin: successful");
                     }
                     else if (d[0] == "show-setting")
                     {
@@ -237,7 +237,7 @@ class Communication : public Task
                                          ",\"ph-cal\": " + String(GlobalControl::PH_CAL) + 
                                          "}";
                         String data = "{\"type\": \"req_setting\",\"data\": " + jsonStr + "}";
-                        Serial.println(data);
+                        mpuCom.println(data);
                     }
                 }
                 //{debug,true}
@@ -251,12 +251,12 @@ class Communication : public Task
                     if (d[0] == "true")
                     {
                         DEBUG = true;
-                        Serial.println("[Done] Debug mode: enable");
+                        mpuCom.println("[Done] Debug mode: enable");
                     }
                     else if (d[0] == "false")
                     {
                         DEBUG = false;
-                        Serial.println("[Done] debug mode: disable");
+                        mpuCom.println("[Done] debug mode: disable");
                     }
                 }
             }
@@ -342,7 +342,7 @@ class Communication : public Task
 
             String a = res.substring(0, index);
             data[j] = a;
-            // Serial.println(data[j]);
+            // mpuCom.println(data[j]);
             si = index;
             res = res.substring(index + 1);
             j++;

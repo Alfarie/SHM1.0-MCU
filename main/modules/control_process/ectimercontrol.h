@@ -25,7 +25,7 @@ class ECTimerControl : public Task
     int CurrentMinMatch = 0;
     virtual bool OnStart()
     {
-        Serial.println("[Info] EC Timer control Start..");
+        mpuCom.println("[Info] EC Timer control Start..");
         timerList = GlobalControl::GetECTimer();
         working = GlobalControl::EC_TIMER_WORKING;
     }
@@ -39,7 +39,7 @@ class ECTimerControl : public Task
             {
                 // PrintTimer(timerList.at(i));
                 int timerMin = GlobalControl::EC_TIMER_LIST.at(i);
-                // Serial.println(String(timerMin));
+                // mpuCom.println(String(timerMin));
                 if (timerMin == currentMin)
                 {
                     CurrentMinMatch = timerMin;
@@ -50,23 +50,23 @@ class ECTimerControl : public Task
             if (flag)
             {
                 if (DEBUG)
-                    Serial.println("LED ON");
-                digitalWrite(Gpio::EC_A_PUMP, ON);
+                    mpuCom.println("LED ON_S");
+                digitalWrite(Gpio::EC_A_PUMP, ON_S);
                 state = 1;
             }
             String jsonStr = "{\"type\": \"ectimer-control\",\"data\": { \"time\":" + String(currentMin) + ", \"endtime\": " + String(currentMin) + ", \"process\": \"Waiting\"} }";
-            Serial.println(jsonStr);
+            mpuCom.println(jsonStr);
         }
         else if (state == 1)
         {
             _timer += ( (float)delta_time/1000);
             String jsonStr = "{\"type\": \"ectimer-control\",\"data\": { \"time\":" + String(currentMin) + ", \"endtime\": " + String(working) + ", \"process\": \"Working\"} }";
-            Serial.println(jsonStr);
+            mpuCom.println(jsonStr);
            
-            // Serial.println( "ectimer:" + String(_timer) + "/" + String(GlobalControl::EC_TIMER_WORKING));
+            // mpuCom.println( "ectimer:" + String(_timer) + "/" + String(GlobalControl::EC_TIMER_WORKING));
             if (_timer >= GlobalControl::EC_TIMER_WORKING)
             {
-                digitalWrite(Gpio::EC_A_PUMP, OFF);
+                digitalWrite(Gpio::EC_A_PUMP, OFF_S);
                 _timer = 0;
                 state = 2;
             }
@@ -76,7 +76,7 @@ class ECTimerControl : public Task
         }
         if(state == 2 && currentMin != CurrentMinMatch){
             String jsonStr = "{\"type\": \"ectimer-control\",\"data\": { \"time\":" + String(currentMin) + ", \"endtime\": " + String(working) + ", \"process\": \"Working\"} }";
-            Serial.println(jsonStr);
+            mpuCom.println(jsonStr);
             state = 0;
         }
     }

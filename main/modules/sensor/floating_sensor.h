@@ -22,11 +22,11 @@ class FloatingSensorDetect : public Task
 
     virtual bool OnStart(){
         pinMode(_Pin, INPUT);
-        //Serial.println("Start Floating Sensor");
+        //mpuCom.println("Start Floating Sensor");
     }
 
     virtual void OnUpdate(uint32_t deltaTime){
-        // //Serial.println("Test");
+        // //mpuCom.println("Test");
         if(digitalRead(_Pin) != _state){
              _timer += deltaTime;
              if(_timer >= 5000){

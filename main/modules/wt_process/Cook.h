@@ -30,7 +30,7 @@ class Cook : public Task
     }
     virtual void OnUpdate(uint32_t delta_time)
     {
-        //Serial.println("Cook update");
+        //mpuCom.println("Cook update");
 
         
         _timer += delta_time;
@@ -38,7 +38,7 @@ class Cook : public Task
         String str = "Timer: " + String(_timer/1000) +"/" + String(rtime/1000);
 
         String jsonStr = "{\"type\": \"water\",\"data\": { \"time\":" + String(_timer) + ", \"total_time\": "+ String(rtime) + ", \"process\": \"Cooking\"} }";
-        Serial.println(jsonStr);
+        mpuCom.println(jsonStr);
         lcd.print(str);
         if (_timer >= rtime)
         {

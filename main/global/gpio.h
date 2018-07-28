@@ -49,22 +49,22 @@ class Gpio
         pinMode(DOOR_BUTTON, INPUT);
         pinMode(LED, OUTPUT);
         
-        digitalWrite(FEED_WATER_MOTOR, OFF);
-        digitalWrite(FRESH_WATER_VALVE, OFF);
-        digitalWrite(EC_A_PUMP, OFF);
-        digitalWrite(EC_B_PUMP, OFF);
-        digitalWrite(PH_PUMP, OFF);
-        digitalWrite(CO2_VALVE, OFF);
-        digitalWrite(LED, OFF);
+        digitalWrite(FEED_WATER_MOTOR, OFF_S);
+        digitalWrite(FRESH_WATER_VALVE, OFF_S);
+        digitalWrite(EC_A_PUMP, OFF_S);
+        digitalWrite(EC_B_PUMP, OFF_S);
+        digitalWrite(PH_PUMP, OFF_S);
+        digitalWrite(CO2_VALVE, OFF_S);
+        digitalWrite(LED, OFF_S);
     }
 
     static void AllON()
     {
-        digitalWrite(FEED_WATER_MOTOR, ON);
-        digitalWrite(FRESH_WATER_VALVE, ON);
-        digitalWrite(EC_A_PUMP, ON);
-        digitalWrite(EC_B_PUMP, ON);
-        digitalWrite(PH_PUMP, ON);
-        digitalWrite(CO2_VALVE, ON);
+        digitalWrite(FEED_WATER_MOTOR, ON_S);
+        digitalWrite(FRESH_WATER_VALVE, ON_S);
+        digitalWrite(EC_A_PUMP, ON_S);
+        digitalWrite(EC_B_PUMP, ON_S);
+        digitalWrite(PH_PUMP, ON_S);
+        digitalWrite(CO2_VALVE, ON_S);
     }
 };

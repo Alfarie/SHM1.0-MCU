@@ -48,7 +48,7 @@ class ECSensor: public Task{
             else _ec=5.3*CoefficientVolatge+2278;    
             _ec = _ec/1000;
             _ec = _ec/GlobalControl::EC_CAL;
-            if(DEBUG) Serial.println("EC: " + String(_ec) + ", cal:" + GlobalControl::EC_CAL);
+            if(DEBUG) mpuCom.println("EC: " + String(_ec) + ", cal:" + GlobalControl::EC_CAL);
             readIndex = 0;
         }
     }

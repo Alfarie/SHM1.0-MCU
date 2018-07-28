@@ -22,7 +22,7 @@ class CO2 : public Task
     int valMultiplier = 1;
     virtual bool OnStart()
     {
-        Serial.println("[PlantLab] CO2 sensor Initialize...");
+        mpuCom.println("[PlantLab] CO2 sensor Initialize...");
     }
     virtual void OnUpdate(uint32_t delta_time)
     {
@@ -34,7 +34,6 @@ class CO2 : public Task
         else
         {
             _ppmCO2 = tempco2;
-            Serial.print("Failure to read sensor\n");
         }
     }
 };

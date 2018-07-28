@@ -1,5 +1,5 @@
 /*
- *  //Serial command:
+ *  //mpuCom command:
  *  -  WATER{0,10,15} 
  *  -  DATETIME{11,9,17,3,30}
  * 
@@ -57,7 +57,7 @@ String cmd;
 void TestPassByRef(std::vector<Timer> &tl) {
   uint32_t val1 = tl.at(0).start_time;
   uint32_t val2 = tl.at(0).end_time;
-  //Serial.println( String(val1) + "," + String(val2) );
+  //mpuCom.println( String(val1) + "," + String(val2) );
   tl.at(0).end_time = 70;
 }
 
@@ -109,16 +109,16 @@ void getDateDs1307(DateTime &dt)
 void checkValve(){
   if(timer_list.size() != 0 ){
     uint32_t nt = getTimeMinute();
-//    //Serial.println("now: " + String(nt));
+//    //mpuCom.println("now: " + String(nt));
     for(int i = 0; i < timer_list.size(); i++){
       if( nt >= timer_list.at(i).start_time && nt <= timer_list.at(i).end_time){
-        //Serial.println("valve ON");
+        //mpuCom.println("valve ON_S");
         return;
       }
     }
   }
   else{
-//    //Serial.println("No timer list");
+//    //mpuCom.println("No timer list");
   }
 }
 
@@ -135,7 +135,7 @@ byte bcdToDec(byte val) {
 }
 
 void setup() {
-  //Serial.begin(57600);
+  //mpuCom.begin(57600);
   Wire.begin();
   wt_param = {0, 5, 15};
   // setDateDs1307(0, 30, 3, 6, 11, 9, 17);
@@ -143,19 +143,19 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  // //Serial.println("Test");
+  // //mpuCom.println("Test");
   getDateDs1307(date_time);
   checkValve();
-  while (//Serial.available()) {
-    char ch = //Serial.read();
+  while (//mpuCom.available()) {
+    char ch = //mpuCom.read();
     cmd += ch;
     if (cmd.endsWith("WATER")) {
      
       cmd = "";
       bool flag = true;
       while (true) {
-        while (//Serial.available()) {
-          ch = //Serial.read();
+        while (//mpuCom.available()) {
+          ch = //mpuCom.read();
           cmd += ch;
           if (cmd.endsWith("}")) {
             String rstr = cmd;
@@ -178,26 +178,26 @@ void loop() {
             for (int i = 0 ; i < timer_list.size() ; i++) {
               uint32_t Start = timer_list.at(i).start_time;
               uint32_t End = timer_list.at(i).end_time;
-              //Serial.println( String(Start) + "-" + String(End));
+              //mpuCom.println( String(Start) + "-" + String(End));
             }
             flag = false;
           }
         }
         if (!flag) {
-          //Serial.flush();
+          //mpuCom.flush();
           break;
         }
       }
     }
 
     if (cmd.endsWith("DATETIME")) {
-      ////Serial.println("[DATETIME] fomr node");
+      ////mpuCom.println("[DATETIME] fomr node");
       cmd = "";
       bool flag = true;
 
       while (true) {
-        while (//Serial.available()) {
-          ch = //Serial.read();
+        while (//mpuCom.available()) {
+          ch = //mpuCom.read();
           cmd += ch;
           if (cmd.endsWith("}")) {
             String rstr = cmd;
@@ -223,7 +223,7 @@ void loop() {
           }
         }
         if (!flag) {
-          //Serial.flush();
+          //mpuCom.flush();
           break;
         }
       }

@@ -36,11 +36,11 @@ class pHSensor : public Task
                 num++;
             }
             avgVoltage = avgVoltage / num;
-            // Serial.println("pH:" + String(avgVoltage));
+            // mpuCom.println("pH:" + String(avgVoltage));
             _ph = avgVoltage * 5.0 / 1024.0;
             _ph = 3.5 * _ph;
             _ph = _ph/GlobalControl::PH_CAL;
-            //Serial.println("[Info] [PlantLab] pH: " + String(_ph));
+            //mpuCom.println("[Info] [PlantLab] pH: " + String(_ph));
             lcd.setCursor(0,1);
             // lcd.print("pH:" + String(_ph));
             readIndex = 0;

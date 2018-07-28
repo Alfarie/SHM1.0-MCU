@@ -40,16 +40,16 @@ class TimerControl : public Task
             }
         }
         if(flag){
-            if(DEBUG) Serial.println("LED ON");
-            digitalWrite(Gpio::LED, ON);
+            if(DEBUG) mpuCom.println("LED ON_S");
+            digitalWrite(Gpio::LED, ON_S);
         }
         else {
-            if(DEBUG) Serial.println("LED OFF");
-            digitalWrite(Gpio::LED, OFF);
+            if(DEBUG) mpuCom.println("LED OFF_S");
+            digitalWrite(Gpio::LED, OFF_S);
         }
     }
     void PrintTimer(Timer time)
     {
-        Serial.println("time:" + String(time.start) + "," + String(time.end) + " currentMin:" + String(_datetime->GetCurrentMin()) );
+        mpuCom.println("time:" + String(time.start) + "," + String(time.end) + " currentMin:" + String(_datetime->GetCurrentMin()) );
     }
 };

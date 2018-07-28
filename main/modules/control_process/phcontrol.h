@@ -34,11 +34,11 @@ class PHControl : public Task
          _setpoint = GlobalControl::PH_SETPOINT;
         _working = GlobalControl::PH_WORKING * 1000;
         _detecting = GlobalControl::PH_DETECTING * 1000;
-         Serial.println("[Info] pH Control initialize...");
+         mpuCom.println("[Info] pH Control initialize...");
     }
     virtual void OnUpdate(uint32_t delta_time)
     {
-        // //Serial.println(String(_sensor->GetEC()));
+        // //mpuCom.println(String(_sensor->GetEC()));
         float sensor = _sensor->GetpH();
         String co2interval = String(sensor) + "/" + String(_setpoint);
         if (sensor > _setpoint)
@@ -47,9 +47,9 @@ class PHControl : public Task
         }
         else
         {
-            Serial.println("ec Stop Task no feed");
+            mpuCom.println("ec Stop Task no feed");
             String jsonStr = "{\"type\": \"pH-control\",\"data\": { \"time\":" + String(_timer) + ", \"working\": " + String(_working) + ", \"process\": \"No Feed "+co2interval+"\"} }";
-            Serial.println(jsonStr);
+            mpuCom.println(jsonStr);
 
             taskManager.StopTask(this);
             
@@ -63,7 +63,7 @@ class PHControl : public Task
             
             String jsonStr = "{\"type\": \"pH-control\",\"data\": { \"time\":" + String(_timer) + ", \"working\": " + String(_working) + ", \"process\": \"Feeding " + co2interval + " \"} }";
 
-            Serial.println(jsonStr);
+            mpuCom.println(jsonStr);
             if (_timer >= _working)
             {
                 digitalWrite(Gpio::PH_PUMP, LOW);
@@ -71,7 +71,7 @@ class PHControl : public Task
                 working_state = false;
 
                 String jsonStr = "{\"type\": \"pH-control\",\"data\": { \"time\":" + String(_timer) + ", \"working\": " + String(_working) + ", \"process\": \"No Feed "+co2interval+"\"} }";
-                Serial.println(jsonStr);
+                mpuCom.println(jsonStr);
 
                 taskManager.StopTask(this);
             }
@@ -89,12 +89,12 @@ class PHControl : public Task
 //             if (lowerCon && upCon)
 //             {
 //                 analogWrite(Gpio::PH_PUMP, 255);
-//                 // //Serial.println("GPIO ON");
+//                 // //mpuCom.println("GPIO ON_S");
 //                 state = 2;
 //             }
 //             else
 //             {
-//                 // //Serial.println("GPIO OFF");
+//                 // //mpuCom.println("GPIO OFF_S");
 //                 analogWrite(Gpio::PH_PUMP, 0);
 //             }
 //         }
@@ -102,7 +102,7 @@ class PHControl : public Task
 //         {
 //             if (!upCon)
 //             {
-//                 // //Serial.println("GPIO ON");
+//                 // //mpuCom.println("GPIO ON_S");
 //                 analogWrite(Gpio::PH_PUMP, 0);
 //                 state = 1;
 //             }

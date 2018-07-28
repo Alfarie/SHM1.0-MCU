@@ -33,13 +33,13 @@ private:
     _upper = (int)GlobalControl::CO2_SETPOINT + 150;
     _lower = (int)GlobalControl::CO2_SETPOINT - 150;
 
-    Serial.println("[Info] CO2 control Initializing...");
+    mpuCom.println("[Info] CO2 control Initializing...");
   }
   virtual void OnUpdate(uint32_t delta_time)
   {
-    // //Serial.println("[Info] CO2Control update " + String(_sensor->GetCO2()));
+    // //mpuCom.println("[Info] CO2Control update " + String(_sensor->GetCO2()));
     String str = "CO2: " + String(_sensor->GetCO2()) + " ppm";
-    // Serial.println(str);
+    // mpuCom.println(str);
     lcd.setCursor(0, 0);
     lcd.print(str);
     bool OFFCon = _sensor->GetCO2() <= _lower;
@@ -51,16 +51,16 @@ private:
         if (digitalRead(Gpio::DOOR_BUTTON) == LOW)
         {
           String jsonStr = "{\"type\": \"co2-control\",\"data\": { \"values\": \"" + String(_sensor->GetCO2()) + "/" + String(_upper) + "\", \"process\": \"Feed CO2\"} }";
-          Serial.println(jsonStr);
-          digitalWrite(Gpio::CO2_VALVE, ON);
+          mpuCom.println(jsonStr);
+          digitalWrite(Gpio::CO2_VALVE, ON_S);
         }
         state = 2;
       }
       else
       {
         String jsonStr = "{\"type\": \"co2-control\",\"data\": { \"values\": \"" + String(_sensor->GetCO2()) + "/" + String(_upper) + "\", \"process\": \"No Feed CO2\"} }";
-        Serial.println(jsonStr);
-        digitalWrite(Gpio::CO2_VALVE, OFF);
+        mpuCom.println(jsonStr);
+        digitalWrite(Gpio::CO2_VALVE, OFF_S);
       }
     }
     else if (state == 2)
@@ -68,8 +68,8 @@ private:
       if (!upCon)
       {
          String jsonStr = "{\"type\": \"co2-control\",\"data\": { \"values\": \"" + String(_sensor->GetCO2()) + "/" + String(_upper) + "\", \"process\": \"No Feed CO2\"} }";
-          Serial.println(jsonStr);
-        digitalWrite(Gpio::CO2_VALVE, OFF);
+          mpuCom.println(jsonStr);
+        digitalWrite(Gpio::CO2_VALVE, OFF_S);
         state = 1;
       }
     }

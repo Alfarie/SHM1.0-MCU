@@ -7,11 +7,10 @@
 #include <LibHumidity.h>
 
 HardwareSerial &mpuCom = Serial3;
+HardwareSerial &debugCom = Serial;
 
 LibHumidity humidity = LibHumidity(0);
-
 // MCP320X adc(53);
-
 LiquidCrystal_I2C lcd(0x3E, 16, 2);
 
 struct Timer
@@ -76,7 +75,7 @@ void setup()
     Wire.begin();
 
     mpuCom.begin(57600);
-
+    debugCom.begin(57600);
     SerialOnStart();
     // Initialize EEPROM
     GlobalControl::InitEEPROM();
@@ -156,4 +155,12 @@ void SerialOnStart()
     mpuCom.println("[Info] Debug Mode: " + debugMode);
     mpuCom.println("[Info] successful.");
     mpuCom.println();
+
+
+    debugCom.println();
+    debugCom.println("[Info] PlantLab Demo Version.");
+    debugCom.println("[Info] Initialize...");
+    debugCom.println("[Info] Debug Mode: " + debugMode);
+    debugCom.println("[Info] successful.");
+    debugCom.println();
 }

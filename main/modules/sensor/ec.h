@@ -1,13 +1,15 @@
 #include<Task.h>
-
-
 extern TaskManager taskManager;
+#include "DFRobot_EC.h"
+DFRobot_EC ecv2;
 
 class ECSensor: public Task{
    public:
        ECSensor():
            Task(MsToTaskTime(100))
-       { };
+       { 
+           ecv2.begin();
+       };
 
        float GetEC(){
            return _ec;
@@ -18,6 +20,7 @@ class ECSensor: public Task{
     float _temp = 28;
     int analogReadVal[30];
     int readIndex = 0;
+    
     virtual bool OnStart()
     {
 
@@ -40,13 +43,7 @@ class ECSensor: public Task{
             }
             avgVoltage = avgVoltage / num;
             avgVoltage = avgVoltage * 5000 / 1024;
-            float TempCoefficient=1.0+0.0185*(_temp-25.0);
-            float CoefficientVolatge=(float)avgVoltage/TempCoefficient;
-            
-            if(CoefficientVolatge<=448) _ec= 6.84*CoefficientVolatge-64.32;   //1ms/cm<EC<=3ms/cm
-            else if(CoefficientVolatge<=1457) _ec= 6.98*CoefficientVolatge-127;  //3ms/cm<EC<=10ms/cm
-            else _ec=5.3*CoefficientVolatge+2278;    
-            _ec = _ec/1000;
+            _ec = ecv2.readEC(avgVoltage,_temp);
             _ec = _ec/GlobalControl::EC_CAL;
             if(DEBUG) mpuCom.println("EC: " + String(_ec) + ", cal:" + GlobalControl::EC_CAL);
             readIndex = 0;

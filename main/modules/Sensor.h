@@ -6,17 +6,22 @@ extern TaskManager taskManager;
 extern int  __bss_end;
 extern int  *__brkval;
 
+
 #include "./sensor/co2.h"
 #include "./sensor/ph.h"
-#include "./sensor/ec.h"
+
 #include "./sensor/water.h"
 
-ECSensor ec;
+
 pHSensor ph;
 Water water;
 CO2 co2;
 SHT21 sht;
 
+
+#include "./sensor/ec.h"
+
+ECSensor ec;
 
 class Sensor : public Task
 {

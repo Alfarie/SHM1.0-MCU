@@ -38,6 +38,9 @@ class ECSensor: public Task{
                 avgVoltage += analogReadVal[i];
                 num++;
             }
+            
+            _temp = = water.GetWater();
+
             avgVoltage = avgVoltage / num;
             avgVoltage = avgVoltage * 5000 / 1024;
             float TempCoefficient=1.0+0.0185*(_temp-25.0);

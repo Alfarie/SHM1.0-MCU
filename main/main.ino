@@ -1,3 +1,5 @@
+#define VERSION "1.0.1"
+
 #include <Task.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
